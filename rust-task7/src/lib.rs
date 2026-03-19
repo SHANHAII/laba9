@@ -98,3 +98,47 @@ fn fastmath(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_class::<Matrix>()?;
     Ok(())
 }
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_sum_squares() {
+        assert_eq!(sum_squares(vec![1, 2, 3, 4, 5]), 55);
+        assert_eq!(sum_squares(vec![]), 0);
+        assert_eq!(sum_squares(vec![1, 1, 1]), 3);
+    }
+
+    #[test]
+    fn test_mean() {
+        assert_eq!(mean(vec![1.0, 2.0, 3.0, 4.0, 5.0]), 3.0);
+        assert_eq!(mean(vec![]), 0.0);
+        assert_eq!(mean(vec![10.0]), 10.0);
+    }
+
+    #[test]
+    fn test_stats() {
+        let stats = stats(vec![1.0, 2.0, 3.0, 4.0, 5.0]).unwrap();
+        assert_eq!(stats["min"], 1.0);
+        assert_eq!(stats["max"], 5.0);
+        assert_eq!(stats["sum"], 15.0);
+        assert_eq!(stats["mean"], 3.0);
+    }
+
+    #[test]
+    fn test_stats_empty() {
+        assert!(stats(vec![]).is_err());  // Должна быть ошибка
+    }
+
+    #[test]
+    fn test_matrix() {
+        let matrix = Matrix::new(vec![vec![1, 2], vec![3, 4]]).unwrap();
+        assert_eq!(matrix.get(0, 0).unwrap(), 1);
+        assert_eq!(matrix.get(1, 1).unwrap(), 4);
+        
+        let transposed = matrix.transpose().unwrap();
+        assert_eq!(transposed.get(0, 1).unwrap(), 3);
+        
+        assert_eq!(format!("{}", matrix), "Matrix(2x2)");
+    }
+}
