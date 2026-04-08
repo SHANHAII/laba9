@@ -1,0 +1,14 @@
+# Binaries
+*.exe
+*.exe~
+http-server
+tcp-server
+
+# Rust
+target/
+**/*.rs.bk
+
+# Python
+__pycache__/
+.pytest_cache/
+
