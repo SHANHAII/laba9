@@ -1,43 +1,34 @@
 package main
 
 import (
-    "encoding/json"
-    "fmt"
-    "os"
+	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
-type Request struct {
-    Numbers []int `json:"numbers"`
-}
-
-type Response struct {
-    Sum int `json:"sum"`
+type TaskRequest struct {
+	Data string `json:"data" binding:"required"`
 }
 
 func main() {
-    if len(os.Args) > 1 && os.Args[1] == "server" {
-        // Режим сервера
-        startServer()
-        return
-    }
+	r := gin.Default()
 
-    var req Request
-    err := json.NewDecoder(os.Stdin).Decode(&req)
-    if err != nil {
-        return
-    }
-    
-    sum := 0
-    for _, n := range req.Numbers {
-        sum += n * n
-    }
-    
-    resp := Response{Sum: sum}
-    json.NewEncoder(os.Stdout).Encode(resp)
-}
+)
+	r.GET("/health", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"status": "alive"})
+	})
 
-func startServer() {
 
-    fmt.Println("Сервер запущен на :8080")
+	r.POST("/process", func(c *gin.Context) {
+		var json TaskRequest
+		if err := c.ShouldBindJSON(&json); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{
+			"result": "Processed: " + json.Data,
+			"length": len(json.Data),
+		})
+	})
 
+	r.Run(":8080")
 }
